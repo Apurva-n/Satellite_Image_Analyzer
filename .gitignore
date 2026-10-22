@@ -1,0 +1,30 @@
+# Python environments
+.venv/
+venv/
+ee_env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Node dependencies
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Credentials and secrets
+.env
+.env.*
+!.env.example
+credentials.json
+service-account*.json
+*.pem
+*.key
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
