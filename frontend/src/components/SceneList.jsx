@@ -1,13 +1,13 @@
 import React from 'react';
-import { Layers, Calendar, Cloud, CheckCircle, ChevronRight, Award } from 'lucide-react';
+import { Calendar, Cloud, Award, CheckCircle2, ChevronRight, Layers } from 'lucide-react';
 
 const SceneList = ({ scenes, selectedScene, onSelectScene, isSearching }) => {
   if (isSearching) {
     return (
-      <div className="scene-list-card card">
-        <div className="loading-placeholder">
+      <div className="scene-list-card skeleton-pulse">
+        <div className="scene-loading-flex">
           <div className="spinner"></div>
-          <p>Querying Copernicus Sentinel-2 catalog via Earth Engine...</p>
+          <span>Scanning Sentinel-2 constellation orbits...</span>
         </div>
       </div>
     );
@@ -18,73 +18,80 @@ const SceneList = ({ scenes, selectedScene, onSelectScene, isSearching }) => {
   }
 
   // Find scene with minimum cloud cover
-  const cleanestScene = scenes.reduce((prev, curr) =>
-    curr.cloud_pct < prev.cloud_pct ? curr : prev,
+  const clearestScene = scenes.reduce(
+    (prev, curr) => (curr.cloud_pct < prev.cloud_pct ? curr : prev),
     scenes[0]
   );
 
-  const getCloudBadgeClass = (pct) => {
-    if (pct < 10) return 'badge-success';
-    if (pct < 30) return 'badge-warning';
-    return 'badge-danger';
+  const getCloudBadgeStyle = (pct) => {
+    if (pct < 10) return { bg: 'rgba(16, 185, 129, 0.15)', text: '#10b981', border: 'rgba(16, 185, 129, 0.3)' };
+    if (pct < 25) return { bg: 'rgba(245, 158, 11, 0.15)', text: '#f59e0b', border: 'rgba(245, 158, 11, 0.3)' };
+    return { bg: 'rgba(239, 68, 68, 0.15)', text: '#ef4444', border: 'rgba(239, 68, 68, 0.3)' };
   };
 
   return (
-    <div className="scene-list-card card">
+    <div className="scene-list-card">
       <div className="scene-list-header">
-        <div className="title-with-count">
-          <Layers size={18} className="icon-accent" />
-          <h3>Available Satellite Passes</h3>
-          <span className="count-pill">{scenes.length}</span>
+        <div className="scene-header-left">
+          <Layers size={16} className="text-cyan-400" />
+          <h4>Satellite Passes Found</h4>
+          <span className="count-badge">{scenes.length}</span>
         </div>
-        {cleanestScene && (
+
+        {clearestScene && (
           <button
             type="button"
-            className="btn btn-ghost btn-xs"
-            onClick={() => onSelectScene(cleanestScene)}
+            className="clearest-pick-btn"
+            onClick={() => onSelectScene(clearestScene)}
             title="Auto-select lowest cloud pass"
           >
-            <Award size={13} /> Select Clearest ({cleanestScene.cloud_pct}%)
+            <Award size={13} className="text-amber-400" />
+            <span>Best ({clearestScene.cloud_pct}% Clouds)</span>
           </button>
         )}
       </div>
 
-      <div className="scene-items-container">
+      <div className="scene-chips-track">
         {scenes.map((scene) => {
           const isSelected = selectedScene && selectedScene.id === scene.id;
+          const isClearest = clearestScene && clearestScene.id === scene.id;
+          const cloudStyle = getCloudBadgeStyle(scene.cloud_pct);
+
           return (
-            <div
+            <button
               key={scene.id}
-              className={`scene-item ${isSelected ? 'selected' : ''}`}
+              type="button"
+              className={`scene-chip ${isSelected ? 'selected' : ''}`}
               onClick={() => onSelectScene(scene)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') onSelectScene(scene);
-              }}
             >
-              <div className="scene-info-left">
-                <div className="scene-date">
-                  <Calendar size={14} />
-                  <span>{scene.date}</span>
+              <div className="scene-chip-header">
+                <div className="scene-date-group">
+                  <Calendar size={13} className="text-slate-400" />
+                  <span className="scene-date-text">{scene.date}</span>
                 </div>
-                <div className="scene-id-code" title={scene.id}>
-                  {scene.id}
-                </div>
+                {isClearest && <span className="clearest-star-tag">★ Clearest</span>}
               </div>
 
-              <div className="scene-info-right">
-                <div className={`badge ${getCloudBadgeClass(scene.cloud_pct)}`}>
-                  <Cloud size={12} />
-                  <span>{scene.cloud_pct}% cloud</span>
-                </div>
-                {isSelected ? (
-                  <CheckCircle size={18} className="selected-icon" />
-                ) : (
-                  <ChevronRight size={16} className="chevron-icon" />
+              <div className="scene-chip-bottom">
+                <span
+                  className="cloud-pill-tag"
+                  style={{
+                    backgroundColor: cloudStyle.bg,
+                    color: cloudStyle.text,
+                    borderColor: cloudStyle.border,
+                  }}
+                >
+                  <Cloud size={11} />
+                  <span>{scene.cloud_pct}% Clouds</span>
+                </span>
+
+                {isSelected && (
+                  <div className="selected-indicator-dot">
+                    <CheckCircle2 size={13} className="text-cyan-400" />
+                  </div>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

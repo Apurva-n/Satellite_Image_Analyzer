@@ -1,214 +1,89 @@
-import React, { useState, useEffect } from 'react';
-import MapComponent from './components/MapComponent';
-import ControlPanel from './components/ControlPanel';
-import SceneList from './components/SceneList';
-import ThumbnailViewer from './components/ThumbnailViewer';
-import { searchScenes, getThumbnail, checkHealth } from './services/api';
-import { Satellite, Activity, CheckCircle2, XCircle } from 'lucide-react';
-import './App.css';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AppProvider } from './store/AppContext';
+import { AuthProvider } from './context/AuthContext';
+import MainLayout from './layouts/MainLayout';
+import ErrorBoundary from './components/ErrorBoundary';
+import AuthModal from './components/AuthModal';
+import CloudDatabaseModal from './components/CloudDatabaseModal';
+import CloudReportsDrawer from './components/CloudReportsDrawer';
+import { RefreshCw } from 'lucide-react';
+import './styles/mission-control.css';
+import './styles/terrascope.css';
+
+// Lazy-loaded pages
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const WorkbenchPage = lazy(() => import('./pages/WorkbenchPage'));
+const ScenesPage = lazy(() => import('./pages/ScenesPage'));
+const ChangeDetectionPage = lazy(() => import('./pages/ChangeDetectionPage'));
+const LandCoverPage = lazy(() => import('./pages/LandCoverPage'));
+const TimeSeriesPage = lazy(() => import('./pages/TimeSeriesPage'));
+const ReportPage = lazy(() => import('./pages/ReportPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
+const PageLoader = () => (
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100vh',
+      width: '100vw',
+      gap: 14,
+      backgroundColor: 'var(--ts-bg, #F6F8F5)',
+      color: 'var(--ts-forest, #103B32)',
+    }}
+  >
+    <RefreshCw size={28} className="mc-spin" style={{ color: 'var(--ts-forest, #103B32)' }} />
+    <span
+      style={{
+        fontSize: 13,
+        fontWeight: 600,
+        color: 'var(--ts-text-secondary, #485A54)',
+        letterSpacing: 0.5,
+        fontFamily: 'var(--font-mono, monospace)',
+      }}
+    >
+      INITIALIZING TERRASCOPE EARTH ENGINE...
+    </span>
+  </div>
+);
 
 function App() {
-  // BBox format: [lon_min, lat_min, lon_max, lat_max]
-  const [bbox, setBbox] = useState(null);
-  const [startDate, setStartDate] = useState('2026-01-01');
-  const [endDate, setEndDate] = useState('2026-03-31');
-  const [maxCloudPct, setMaxCloudPct] = useState(20);
-
-  // Scenes & Results
-  const [scenes, setScenes] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchError, setSearchError] = useState(null);
-  const [zeroResultsFound, setZeroResultsFound] = useState(false);
-
-  // Selected Scene & Thumbnail
-  const [selectedScene, setSelectedScene] = useState(null);
-  const [thumbnailUrl, setThumbnailUrl] = useState(null);
-  const [isLoadingThumbnail, setIsLoadingThumbnail] = useState(false);
-  const [thumbnailError, setThumbnailError] = useState(null);
-
-  // Map Overlay controls
-  const [showOverlay, setShowOverlay] = useState(true);
-  const [overlayOpacity, setOverlayOpacity] = useState(0.9);
-
-  // Backend connection status
-  const [backendStatus, setBackendStatus] = useState('checking');
-
-  // Verify backend connectivity on load
-  useEffect(() => {
-    const pingBackend = async () => {
-      try {
-        const res = await checkHealth();
-        if (res.status === 'ok') {
-          setBackendStatus('connected');
-        } else {
-          setBackendStatus('error');
-        }
-      } catch (err) {
-        console.warn('Backend not responding at http://localhost:8000', err);
-        setBackendStatus('offline');
-      }
-    };
-    pingBackend();
-  }, []);
-
-  // Search scenes handler
-  const handleSearch = async () => {
-    if (!bbox) return;
-
-    setIsSearching(true);
-    setSearchError(null);
-    setZeroResultsFound(false);
-    setSelectedScene(null);
-    setThumbnailUrl(null);
-    setThumbnailError(null);
-
-    try {
-      const results = await searchScenes(bbox, startDate, endDate, maxCloudPct);
-      setScenes(results);
-
-      if (results.length === 0) {
-        setZeroResultsFound(true);
-      } else {
-        // Auto-select the scene with minimum cloud cover
-        const bestScene = results.reduce((prev, curr) =>
-          curr.cloud_pct < prev.cloud_pct ? curr : prev,
-          results[0]
-        );
-        handleSelectScene(bestScene, bbox);
-      }
-    } catch (err) {
-      console.error('Search failed:', err);
-      const msg =
-        err.response?.data?.detail ||
-        err.message ||
-        'Failed to connect to Earth Engine backend. Ensure backend server is running.';
-      setSearchError(msg);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  // Select scene and load its thumbnail
-  const handleSelectScene = async (scene, currentBbox = bbox) => {
-    setSelectedScene(scene);
-    if (!currentBbox) return;
-
-    setIsLoadingThumbnail(true);
-    setThumbnailError(null);
-
-    try {
-      const data = await getThumbnail(scene.id, currentBbox);
-      setThumbnailUrl(data.thumbnail_url);
-    } catch (err) {
-      console.error('Thumbnail fetch failed:', err);
-      const msg =
-        err.response?.data?.detail ||
-        err.message ||
-        'Failed to generate thumbnail from Earth Engine.';
-      setThumbnailError(msg);
-    } finally {
-      setIsLoadingThumbnail(false);
-    }
-  };
-
-  const handleBBoxChange = (newBbox) => {
-    setBbox(newBbox);
-    // If bbox is removed, reset results
-    if (!newBbox) {
-      setScenes([]);
-      setSelectedScene(null);
-      setThumbnailUrl(null);
-      setZeroResultsFound(false);
-      setSearchError(null);
-    }
-  };
-
   return (
-    <div className="app-container">
-      {/* Top Navigation Bar */}
-      <header className="app-header">
-        <div className="header-left">
-          <div className="app-logo">
-            <Satellite className="logo-icon" size={26} />
-            <div className="brand-titles">
-              <h1>Satellite Image Analyzer</h1>
-              <span className="badge-tag">Sentinel-2 &bull; Google Earth Engine</span>
-            </div>
-          </div>
-        </div>
+    <AppProvider>
+      <AuthProvider>
+        <ErrorBoundary>
+          <BrowserRouter>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* 1. Terrascope Landing Portal (Image 1) */}
+                <Route path="/" element={<LandingPage />} />
 
-        <div className="header-right">
-          <div className={`status-indicator ${backendStatus}`}>
-            {backendStatus === 'connected' ? (
-              <>
-                <CheckCircle2 size={14} />
-                <span>Backend Online (EE Ready)</span>
-              </>
-            ) : backendStatus === 'checking' ? (
-              <>
-                <Activity size={14} className="spin" />
-                <span>Connecting to Backend...</span>
-              </>
-            ) : (
-              <>
-                <XCircle size={14} />
-                <span>Backend Offline (Port 8000)</span>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Main Two-Column Layout */}
-      <main className="app-main">
-        {/* Left Column: Interactive Map */}
-        <section className="map-section">
-          <MapComponent
-            bbox={bbox}
-            onBBoxChange={handleBBoxChange}
-            thumbnailUrl={thumbnailUrl}
-            showOverlay={showOverlay}
-            overlayOpacity={overlayOpacity}
-          />
-        </section>
-
-        {/* Right Column: Controls, Scene Picker & Image Viewer */}
-        <aside className="sidebar-section">
-          <ControlPanel
-            bbox={bbox}
-            onBBoxChange={handleBBoxChange}
-            startDate={startDate}
-            setStartDate={setStartDate}
-            endDate={endDate}
-            setEndDate={setEndDate}
-            maxCloudPct={maxCloudPct}
-            setMaxCloudPct={setMaxCloudPct}
-            onSearch={handleSearch}
-            isSearching={isSearching}
-            searchError={searchError}
-            zeroResultsFound={zeroResultsFound}
-          />
-
-          <SceneList
-            scenes={scenes}
-            selectedScene={selectedScene}
-            onSelectScene={(scene) => handleSelectScene(scene)}
-            isSearching={isSearching}
-          />
-
-          <ThumbnailViewer
-            selectedScene={selectedScene}
-            thumbnailUrl={thumbnailUrl}
-            isLoadingThumbnail={isLoadingThumbnail}
-            thumbnailError={thumbnailError}
-            showOverlay={showOverlay}
-            setShowOverlay={setShowOverlay}
-            overlayOpacity={overlayOpacity}
-            setOverlayOpacity={setOverlayOpacity}
-          />
-        </aside>
-      </main>
-    </div>
+                {/* 2. Terrascope Studio Workbench & Geospatial Pages (Image 2) */}
+                <Route element={<MainLayout />}>
+                  <Route path="/workbench" element={<WorkbenchPage />} />
+                  <Route path="/analysis" element={<WorkbenchPage />} />
+                  <Route path="/scenes" element={<ScenesPage />} />
+                  <Route path="/change-detection" element={<ChangeDetectionPage />} />
+                  <Route path="/land-cover" element={<LandCoverPage />} />
+                  <Route path="/time-series" element={<TimeSeriesPage />} />
+                  <Route path="/report/:id" element={<ReportPage />} />
+                  <Route path="/report" element={<ReportPage />} />
+                  <Route path="/404" element={<NotFoundPage />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Route>
+              </Routes>
+            </Suspense>
+            {/* Global Authentication & Cloud Persistence Modals */}
+            <AuthModal />
+            <CloudDatabaseModal />
+            <CloudReportsDrawer />
+          </BrowserRouter>
+        </ErrorBoundary>
+      </AuthProvider>
+    </AppProvider>
   );
 }
 

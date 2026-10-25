@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import L from '../utils/leaflet';
+import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
@@ -7,8 +8,9 @@ const MapComponent = ({
   bbox,
   onBBoxChange,
   thumbnailUrl,
-  overlayOpacity = 0.9,
+  overlayOpacity = 0.85,
   showOverlay = true,
+  flyToCoords = null,
 }) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -17,48 +19,85 @@ const MapComponent = ({
 
   // Initialize Map
   useEffect(() => {
-    if (mapRef.current) return;
+    if (!mapContainerRef.current || mapRef.current) return;
 
-    // Basemaps
-    const esriSatellite = L.tileLayer(
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    // Basemaps: 
+    // 1. Google Hybrid Satellite (Vivid high-res satellite with crisp roads & topography)
+    const googleHybrid = L.tileLayer(
+      'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
       {
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-        maxZoom: 18,
+        attribution: '&copy; Google Satellite',
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
       }
     );
 
-    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
-    });
-
-    const cartoLabels = L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
+    // 2. Esri World Imagery (Standard Earth Observation Basemap)
+    const esriSatellite = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       {
-        attribution: '&copy; CartoDB',
+        attribution: 'Tiles &copy; Esri, Maxar, Earthstar Geographics',
         maxZoom: 19,
       }
     );
 
-    const map = L.map(mapContainerRef.current, {
-      center: [18.5204, 73.8567], // Pune default
-      zoom: 11,
-      layers: [esriSatellite, cartoLabels],
+    // 3. CartoDB Dark Matter (High-tech Dark Mission Control theme)
+    const cartoDark = L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20,
+      }
+    );
+
+    // 4. OpenStreetMap Standard
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
     });
 
+    // Reference Overlays
+    const cartoLabels = L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
+      {
+        attribution: '&copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19,
+      }
+    );
+
+    // Default center Pune or bbox center
+    let initialCenter = [18.5204, 73.8567];
+    let initialZoom = 12;
+    if (bbox && bbox.length === 4) {
+      initialCenter = [(bbox[1] + bbox[3]) / 2, (bbox[0] + bbox[2]) / 2];
+    }
+
+    const map = L.map(mapContainerRef.current, {
+      center: initialCenter,
+      zoom: initialZoom,
+      layers: [googleHybrid],
+      zoomControl: false,
+    });
+
+    // Zoom control placed bottom-right so it never collides with layer chips or headers
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
     const baseMaps = {
-      'Satellite (Esri)': esriSatellite,
+      'Satellite Hybrid (Google)': googleHybrid,
+      'Satellite Imagery (Esri)': esriSatellite,
+      'Mission Control Dark (Carto)': cartoDark,
       'Street Map (OSM)': osm,
     };
 
     const overlayMaps = {
-      'Place Labels': cartoLabels,
+      'Road & City Labels': cartoLabels,
     };
 
     L.control.layers(baseMaps, overlayMaps, { position: 'topright' }).addTo(map);
 
-    // Feature group for drawn rectangle
+    // Feature group for drawn AOI rectangle
     const drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
     drawnItemsRef.current = drawnItems;
@@ -74,10 +113,11 @@ const MapComponent = ({
         circlemarker: false,
         rectangle: {
           shapeOptions: {
-            color: '#00f2fe',
+            color: '#22d3ee',
             weight: 2,
-            fillColor: '#4facfe',
-            fillOpacity: 0.2,
+            fillColor: '#0891b2',
+            fillOpacity: 0.18,
+            dashArray: '4, 4',
           },
         },
       },
@@ -95,14 +135,28 @@ const MapComponent = ({
       drawnItems.addLayer(layer);
 
       const bounds = layer.getBounds();
-      // bbox format: [lon_min, lat_min, lon_max, lat_max]
+      let west = bounds.getWest();
+      let south = bounds.getSouth();
+      let east = bounds.getEast();
+      let north = bounds.getNorth();
+
+      // Ensure minimum span so clipping geometry is never empty on micro-clicks
+      if (Math.abs(east - west) < 0.005) {
+        east = west + 0.02;
+        west = west - 0.02;
+      }
+      if (Math.abs(north - south) < 0.005) {
+        north = south + 0.02;
+        south = south - 0.02;
+      }
+
       const newBbox = [
-        Number(bounds.getWest().toFixed(6)),
-        Number(bounds.getSouth().toFixed(6)),
-        Number(bounds.getEast().toFixed(6)),
-        Number(bounds.getNorth().toFixed(6)),
+        Number(west.toFixed(6)),
+        Number(south.toFixed(6)),
+        Number(east.toFixed(6)),
+        Number(north.toFixed(6)),
       ];
-      onBBoxChange(newBbox);
+      if (onBBoxChange) onBBoxChange(newBbox);
     });
 
     // Event: Shape Edited
@@ -110,30 +164,89 @@ const MapComponent = ({
       const layers = e.layers;
       layers.eachLayer((layer) => {
         const bounds = layer.getBounds();
+        let west = bounds.getWest();
+        let south = bounds.getSouth();
+        let east = bounds.getEast();
+        let north = bounds.getNorth();
+
+        if (Math.abs(east - west) < 0.005) {
+          east = west + 0.02;
+          west = west - 0.02;
+        }
+        if (Math.abs(north - south) < 0.005) {
+          north = south + 0.02;
+          south = south - 0.02;
+        }
+
         const newBbox = [
-          Number(bounds.getWest().toFixed(6)),
-          Number(bounds.getSouth().toFixed(6)),
-          Number(bounds.getEast().toFixed(6)),
-          Number(bounds.getNorth().toFixed(6)),
+          Number(west.toFixed(6)),
+          Number(south.toFixed(6)),
+          Number(east.toFixed(6)),
+          Number(north.toFixed(6)),
         ];
-        onBBoxChange(newBbox);
+        if (onBBoxChange) onBBoxChange(newBbox);
       });
     });
 
     // Event: Shape Deleted
     map.on(L.Draw.Event.DELETED, () => {
-      onBBoxChange(null);
+      if (onBBoxChange) onBBoxChange(null);
     });
 
     mapRef.current = map;
 
+    // Immediately trigger size calculation and initial bounds if bbox provided
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+      if (bbox && bbox.length === 4) {
+        const [lonMin, latMin, lonMax, latMax] = bbox;
+        const rect = L.rectangle(
+          [
+            [latMin, lonMin],
+            [latMax, lonMax],
+          ],
+          {
+            color: '#22d3ee',
+            weight: 2,
+            fillColor: '#0891b2',
+            fillOpacity: 0.18,
+            dashArray: '4, 4',
+          }
+        );
+        drawnItems.clearLayers();
+        drawnItems.addLayer(rect);
+        map.fitBounds(rect.getBounds(), { padding: [40, 40] });
+      }
+    }, 120);
+
+    // ResizeObserver ensures Leaflet never stays blank when container dimensions change
+    const resizeObserver = new ResizeObserver(() => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize();
+      }
+    });
+    if (mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
     return () => {
+      clearTimeout(timer);
+      resizeObserver.disconnect();
       map.remove();
       mapRef.current = null;
     };
   }, []);
 
-  // Synchronize drawn rectangle if bbox is set programmatically (e.g., sample preset)
+  // Handle flyTo when preset changes
+  useEffect(() => {
+    if (!mapRef.current || !flyToCoords) return;
+    mapRef.current.flyTo(flyToCoords.center, flyToCoords.zoom || 12, {
+      duration: 1.5,
+      easeLinearity: 0.25,
+    });
+  }, [flyToCoords]);
+
+  // Synchronize drawn rectangle if bbox is set programmatically (e.g. preset click)
   useEffect(() => {
     if (!mapRef.current || !drawnItemsRef.current) return;
     if (!bbox || bbox.length !== 4) {
@@ -158,14 +271,15 @@ const MapComponent = ({
           [latMax, lonMax],
         ],
         {
-          color: '#00f2fe',
+          color: '#22d3ee',
           weight: 2,
-          fillColor: '#4facfe',
-          fillOpacity: 0.2,
+          fillColor: '#0891b2',
+          fillOpacity: 0.18,
+          dashArray: '4, 4',
         }
       );
       drawnItemsRef.current.addLayer(rect);
-      mapRef.current.fitBounds(rect.getBounds(), { padding: [30, 30] });
+      mapRef.current.fitBounds(rect.getBounds(), { padding: [40, 40] });
     }
   }, [bbox]);
 
@@ -192,16 +306,26 @@ const MapComponent = ({
 
       overlay.addTo(mapRef.current);
       imageOverlayRef.current = overlay;
+
+      // Ensure view is centered on the satellite scene
+      mapRef.current.fitBounds(bounds, { padding: [40, 40] });
     }
   }, [thumbnailUrl, bbox, showOverlay, overlayOpacity]);
 
   return (
-    <div className="map-wrapper">
-      <div ref={mapContainerRef} className="map-container" />
-      <div className="map-instructions">
-        <span>Use the <strong>Rectangle tool</strong> (top left toolbar) to draw your Area of Interest (AOI).</span>
-      </div>
-    </div>
+    <div
+      ref={mapContainerRef}
+      className="mc-map-container"
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      }}
+    />
   );
 };
 

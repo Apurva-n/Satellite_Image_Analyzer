@@ -1,5 +1,17 @@
-import React from 'react';
-import { Calendar, Cloud, MapPin, Search, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  Calendar,
+  Cloud,
+  MapPin,
+  Search,
+  RefreshCw,
+  AlertCircle,
+  Sparkles,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp,
+  X,
+} from 'lucide-react';
 
 const PUNE_PRESET_BBOX = [73.75, 18.45, 73.95, 18.60];
 
@@ -16,200 +28,168 @@ const ControlPanel = ({
   isSearching,
   searchError,
   zeroResultsFound,
+  scenesCount = 0,
 }) => {
-  const handleUsePreset = () => {
-    onBBoxChange(PUNE_PRESET_BBOX);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Compute approximate area in km2
+  const getAreaKm2 = () => {
+    if (!bbox || bbox.length !== 4) return null;
+    const [w, s, e, n] = bbox;
+    const latMid = (s + n) / 2;
+    const kmPerDegLat = 111.0;
+    const kmPerDegLon = 111.0 * Math.cos((latMid * Math.PI) / 180);
+    const widthKm = Math.abs(e - w) * kmPerDegLon;
+    const heightKm = Math.abs(n - s) * kmPerDegLat;
+    return Math.round(widthKm * heightKm);
   };
 
-  const handleClearBBox = () => {
-    onBBoxChange(null);
-  };
+  const area = getAreaKm2();
 
   return (
-    <div className="control-panel">
-      <div className="panel-header">
-        <h2>Area & Search Controls</h2>
-        <p className="subtitle">Select an area on the map and find real Sentinel-2 satellite passes.</p>
-      </div>
-
-      {/* AOI Card */}
-      <div className="panel-section card">
-        <div className="section-title">
-          <MapPin size={18} className="icon-accent" />
-          <h3>Area of Interest (AOI)</h3>
+    <div className="search-control-card">
+      {/* Current Area Status Banner */}
+      <div className="location-status-banner">
+        <div className="location-meta">
+          <div className="location-icon-circle">
+            <MapPin size={16} className="text-cyan-400" />
+          </div>
+          <div className="location-titles">
+            <span className="location-tag">Target Area</span>
+            <h4 className="location-heading">
+              {area ? `Selected Region (~${area} km²)` : 'No Area Selected'}
+            </h4>
+          </div>
         </div>
 
-        {bbox ? (
-          <div className="bbox-details">
-            <div className="bbox-grid">
-              <div className="coord-item">
-                <span className="coord-label">Lon Min:</span>
-                <span className="coord-val">{bbox[0]}</span>
-              </div>
-              <div className="coord-item">
-                <span className="coord-label">Lat Min:</span>
-                <span className="coord-val">{bbox[1]}</span>
-              </div>
-              <div className="coord-item">
-                <span className="coord-label">Lon Max:</span>
-                <span className="coord-val">{bbox[2]}</span>
-              </div>
-              <div className="coord-item">
-                <span className="coord-label">Lat Max:</span>
-                <span className="coord-val">{bbox[3]}</span>
-              </div>
-            </div>
-            <div className="btn-row">
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={handleClearBBox}
-              >
-                Clear Selection
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="empty-aoi-prompt">
-            <p>No area selected yet. Draw a rectangle on the map using the toolbar on the left.</p>
-            <button
-              type="button"
-              className="btn btn-outline btn-sm"
-              onClick={handleUsePreset}
-            >
-              <Sparkles size={14} /> Load Pune Sample AOI
-            </button>
-          </div>
+        {bbox && (
+          <button
+            type="button"
+            className="clear-btn-chip"
+            onClick={() => onBBoxChange(null)}
+            title="Clear current area"
+          >
+            <X size={13} />
+            <span>Clear</span>
+          </button>
         )}
       </div>
 
-      {/* Date Range Section */}
-      <div className="panel-section card">
-        <div className="section-title">
-          <Calendar size={18} className="icon-accent" />
-          <h3>Date Range</h3>
-        </div>
-        <div className="date-inputs">
-          <div className="input-group">
-            <label htmlFor="start-date">Start Date</label>
-            <input
-              id="start-date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="input-field"
-            />
-          </div>
-          <div className="input-group">
-            <label htmlFor="end-date">End Date</label>
-            <input
-              id="end-date"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="input-field"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Cloud Cover Slider */}
-      <div className="panel-section card">
-        <div className="section-title">
-          <Cloud size={18} className="icon-accent" />
-          <div className="slider-header">
-            <h3>Max Cloud Cover</h3>
-            <span className="slider-badge">{maxCloudPct}%</span>
-          </div>
-        </div>
-
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="5"
-          value={maxCloudPct}
-          onChange={(e) => setMaxCloudPct(Number(e.target.value))}
-          className="slider"
-        />
-
-        <div className="slider-presets">
+      {!bbox && (
+        <div className="aoi-helper-prompt">
+          <p>Draw a rectangle on the map or pick one of the landmark presets above to inspect satellite imagery.</p>
           <button
             type="button"
-            className={`chip ${maxCloudPct === 10 ? 'active' : ''}`}
-            onClick={() => setMaxCloudPct(10)}
+            className="btn btn-outline btn-sm"
+            onClick={() => onBBoxChange(PUNE_PRESET_BBOX)}
           >
-            &lt; 10%
-          </button>
-          <button
-            type="button"
-            className={`chip ${maxCloudPct === 20 ? 'active' : ''}`}
-            onClick={() => setMaxCloudPct(20)}
-          >
-            &lt; 20% (Default)
-          </button>
-          <button
-            type="button"
-            className={`chip ${maxCloudPct === 50 ? 'active' : ''}`}
-            onClick={() => setMaxCloudPct(50)}
-          >
-            &lt; 50%
-          </button>
-          <button
-            type="button"
-            className={`chip ${maxCloudPct === 80 ? 'active' : ''}`}
-            onClick={() => setMaxCloudPct(80)}
-          >
-            &lt; 80% (Monsoon)
+            <Sparkles size={14} /> Load Pune Sample Area
           </button>
         </div>
-      </div>
+      )}
 
-      {/* Action Button */}
-      <div className="panel-actions">
+      {/* Main Search Action */}
+      <div className="search-action-row">
         <button
           type="button"
-          className="btn btn-primary btn-block"
+          className="btn btn-primary btn-search-hero"
           onClick={onSearch}
           disabled={!bbox || isSearching}
         >
           {isSearching ? (
             <>
-              <RefreshCw size={16} className="spin" /> Searching Earth Engine...
+              <RefreshCw size={17} className="spin" />
+              <span>Querying Sentinel-2 Catalog...</span>
             </>
           ) : (
             <>
-              <Search size={16} /> Search Satellite Scenes
+              <Search size={17} />
+              <span>{scenesCount > 0 ? 'Refresh Passes' : 'Search Satellite Passes'}</span>
             </>
           )}
         </button>
-        {!bbox && (
-          <span className="hint-text text-center">
-            * Draw an area on the map or click 'Load Pune Sample AOI' to search
-          </span>
-        )}
+
+        <button
+          type="button"
+          className={`btn btn-secondary filter-toggle-btn ${showAdvanced ? 'active' : ''}`}
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          title="Adjust search dates and maximum cloud percentage"
+        >
+          <SlidersHorizontal size={15} />
+          {showAdvanced ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </button>
       </div>
 
-      {/* Feedback & Alerts */}
-      {zeroResultsFound && (
-        <div className="alert alert-warning">
-          <AlertCircle size={18} className="alert-icon" />
-          <div className="alert-content">
-            <strong>No Low-Cloud Scenes Found</strong>
-            <p>
-              Earth Engine returned 0 scenes for this area and date range. Consider widening your date
-              range or increasing the cloud cover slider (e.g. &lt; 80% during rainy/monsoon seasons).
-            </p>
+      {/* Collapsible Advanced Filters */}
+      {showAdvanced && (
+        <div className="advanced-filters-drawer">
+          <div className="filter-dates-grid">
+            <div className="input-group">
+              <label htmlFor="start-date" className="filter-label">
+                <Calendar size={13} /> Start Date
+              </label>
+              <input
+                id="start-date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="input-field"
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="end-date" className="filter-label">
+                <Calendar size={13} /> End Date
+              </label>
+              <input
+                id="end-date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="input-field"
+              />
+            </div>
+          </div>
+
+          <div className="filter-slider-group">
+            <div className="slider-header-flex">
+              <span className="filter-label">
+                <Cloud size={13} /> Max Cloud Filter
+              </span>
+              <span className="slider-pct-badge">{maxCloudPct}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              value={maxCloudPct}
+              onChange={(e) => setMaxCloudPct(Number(e.target.value))}
+              className="cloud-slider"
+            />
+            <div className="slider-hints">
+              <span>0% (Pristine)</span>
+              <span>20% (Recommended)</span>
+              <span>100% (Any)</span>
+            </div>
           </div>
         </div>
       )}
 
+      {/* Errors & Empty States */}
       {searchError && (
-        <div className="alert alert-error">
-          <AlertCircle size={18} className="alert-icon" />
-          <div className="alert-content">
-            <strong>Backend Error</strong>
-            <p>{searchError}</p>
+        <div className="error-callout">
+          <AlertCircle size={16} />
+          <p>{searchError}</p>
+        </div>
+      )}
+
+      {zeroResultsFound && (
+        <div className="warning-callout">
+          <AlertCircle size={16} />
+          <div>
+            <strong>No Low-Cloud Passes Found</strong>
+            <p>During monsoon or winter cloudiness, try increasing the Cloud Cover slider to 30% or selecting dry-season months (Jan–April).</p>
           </div>
         </div>
       )}

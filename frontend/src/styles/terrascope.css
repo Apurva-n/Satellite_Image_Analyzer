@@ -1,0 +1,1986 @@
+/* =====================================================================
+   TERRASCOPE DESIGN SYSTEM & PALETTE
+   Editorial Geospatial Intelligence (Forest Green & Light Sage Theme)
+   ===================================================================== */
+
+:root {
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Terrascope Color Palette */
+  --ts-bg: #EEF5EE;
+  --ts-bg-subtle: #E4EFE4;
+  --ts-surface: #FFFFFF;
+  --ts-surface-hover: #F9FAF8;
+  
+  /* Forest Greens */
+  --ts-forest: #103B32;
+  --ts-forest-dark: #0A2922;
+  --ts-forest-light: #164E43;
+  --ts-forest-deep: #0D2621;
+  
+  /* Mint & Sage Accents */
+  --ts-mint: #A7F3D0;
+  --ts-mint-dark: #10B981;
+  --ts-mint-subtle: #E6F7F0;
+  --ts-mint-badge: #D1FAE5;
+  --ts-emerald: #059669;
+
+  /* Alert & Status Colors */
+  --ts-amber: #D97706;
+  --ts-amber-subtle: #FEF3C7;
+  --ts-red: #DC2626;
+  --ts-red-subtle: #FEE2E2;
+  --ts-blue: #2563EB;
+  --ts-blue-subtle: #DBEAFE;
+
+  /* Typography Colors */
+  --ts-text-main: #11231F;
+  --ts-text-secondary: #485A54;
+  --ts-text-muted: #71837D;
+  --ts-text-light: #94A39D;
+  --ts-text-on-dark: #FFFFFF;
+
+  /* Borders & Shadows */
+  --ts-border: rgba(16, 59, 50, 0.08);
+  --ts-border-strong: rgba(16, 59, 50, 0.16);
+  --ts-border-active: #103B32;
+  
+  --ts-shadow-sm: 0 1px 3px rgba(16, 59, 50, 0.05);
+  --ts-shadow-md: 0 4px 20px -2px rgba(16, 59, 50, 0.07);
+  --ts-shadow-lg: 0 12px 36px -4px rgba(16, 59, 50, 0.12);
+  --ts-shadow-hover: 0 8px 30px rgba(16, 59, 50, 0.12);
+
+  /* Radius */
+  --ts-radius-sm: 8px;
+  --ts-radius-md: 12px;
+  --ts-radius-lg: 16px;
+  --ts-radius-xl: 24px;
+  --ts-radius-full: 9999px;
+}
+
+/* Global Reset & Base */
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--ts-bg);
+  color: var(--ts-text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, .ts-serif {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* Scroll Anchors */
+#overview, #workflow, #capabilities, #docs {
+  scroll-margin-top: 84px;
+}
+
+/* =====================================================================
+   SCROLL-TRIGGERED REVEAL SYSTEM
+   ===================================================================== */
+.ts-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.ts-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ts-stagger-1 { transition-delay: 0.08s; }
+.ts-stagger-2 { transition-delay: 0.16s; }
+.ts-stagger-3 { transition-delay: 0.24s; }
+.ts-stagger-4 { transition-delay: 0.32s; }
+
+/* =====================================================================
+   LANDING PAGE STYLES
+   ===================================================================== */
+.ts-landing-root {
+  min-height: 100vh;
+  background-color: #EEF5EE;
+  background: radial-gradient(circle at 50% 0%, rgba(167, 243, 208, 0.42) 0%, rgba(238, 245, 238, 0.95) 45%, #EEF5EE 100%);
+  color: var(--ts-text-main);
+  overflow-x: hidden;
+  overflow-y: visible;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Sticky Header Wrap with Glass Blur */
+.ts-landing-header-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(238, 245, 238, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--ts-border);
+  transition: box-shadow 0.3s ease;
+}
+
+.ts-landing-header-wrap.scrolled {
+  box-shadow: 0 4px 20px rgba(16, 59, 50, 0.06);
+}
+
+/* Header */
+.ts-landing-nav {
+  height: 72px;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ts-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.ts-brand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--ts-forest);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ts-brand-title {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--ts-forest);
+}
+
+.ts-brand-tagline {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--ts-text-muted);
+}
+
+.ts-nav-pill-connected {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--ts-radius-full);
+  background-color: var(--ts-mint-subtle);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ts-forest);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ts-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--ts-emerald);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+.ts-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.ts-nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ts-text-secondary);
+  text-decoration: none;
+  position: relative;
+  padding: 4px 0;
+  transition: color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--ts-forest);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-nav-link:hover {
+  color: var(--ts-forest);
+}
+
+.ts-nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.ts-nav-cta {
+  background-color: var(--ts-forest);
+  color: #FFFFFF;
+  padding: 8px 18px;
+  border-radius: var(--ts-radius-full);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(16, 59, 50, 0.15);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-nav-cta::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -70%;
+  width: 45%;
+  height: 220%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: rotate(25deg);
+  transition: left 0.75s ease;
+  pointer-events: none;
+}
+
+.ts-nav-cta:hover::after {
+  left: 140%;
+}
+
+.ts-nav-cta:hover {
+  background-color: var(--ts-forest-dark);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 18px rgba(16, 59, 50, 0.25);
+}
+
+.ts-nav-cta svg {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-nav-cta:hover svg {
+  transform: translateX(4px);
+}
+
+.ts-nav-cta:active {
+  transform: scale(0.97);
+}
+
+/* Hero Section */
+.ts-hero-container {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 64px 32px 80px 32px;
+  display: grid;
+  grid-template-columns: 1.15fr 0.95fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.ts-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--ts-radius-full);
+  background-color: var(--ts-bg-subtle);
+  border: 1px solid var(--ts-border-strong);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ts-forest);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.ts-hero-headline {
+  font-size: 56px;
+  line-height: 1.08;
+  color: var(--ts-forest);
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.ts-hero-description {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ts-text-secondary);
+  max-width: 520px;
+  margin-bottom: 32px;
+}
+
+.ts-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.ts-btn-primary {
+  background-color: var(--ts-forest);
+  color: #FFFFFF;
+  padding: 12px 26px;
+  border-radius: var(--ts-radius-full);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(16, 59, 50, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -70%;
+  width: 45%;
+  height: 220%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: rotate(25deg);
+  transition: left 0.75s ease;
+  pointer-events: none;
+}
+
+.ts-btn-primary:hover::after {
+  left: 140%;
+}
+
+.ts-btn-primary:hover {
+  background-color: var(--ts-forest-dark);
+  box-shadow: 0 10px 28px -2px rgba(16, 59, 50, 0.3);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.ts-btn-primary svg {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-primary:hover svg {
+  transform: translateX(4px);
+}
+
+.ts-btn-primary:active {
+  transform: scale(0.97);
+}
+
+.ts-btn-secondary {
+  background-color: var(--ts-surface);
+  color: var(--ts-forest);
+  border: 1px solid var(--ts-border-strong);
+  padding: 12px 24px;
+  border-radius: var(--ts-radius-full);
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: var(--ts-shadow-sm);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-secondary:hover {
+  background-color: var(--ts-surface-hover);
+  border-color: var(--ts-forest);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 6px 18px rgba(16, 59, 50, 0.08);
+}
+
+.ts-btn-secondary:active {
+  transform: scale(0.97);
+}
+
+.ts-hero-meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ts-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Float Ambient Keyframes */
+@keyframes tsFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Hero Right Simulated Preview Card */
+.ts-hero-card {
+  position: relative;
+  background-color: #071310;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px -12px rgba(16, 59, 50, 0.25);
+  border: 1px solid rgba(16, 59, 50, 0.15);
+  aspect-ratio: 4 / 3.4;
+  display: flex;
+  flex-direction: column;
+  animation: tsFloat 7s ease-in-out infinite;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-hero-card:hover {
+  animation-play-state: paused;
+  transform: perspective(1000px) rotateX(1.5deg) rotateY(-2deg) scale(1.02);
+  box-shadow: 0 32px 70px -10px rgba(16, 59, 50, 0.32);
+}
+
+.ts-hero-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.92;
+}
+
+.ts-hero-card-hud-top {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #FFFFFF;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+
+.ts-hero-card-box {
+  position: absolute;
+  top: 22%;
+  left: 15%;
+  width: 65%;
+  height: 55%;
+  border: 2px dashed rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.ts-hero-card-box-label {
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  background: rgba(16, 59, 50, 0.9);
+  color: #FFFFFF;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.ts-hero-card-badge {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  color: var(--ts-forest);
+}
+
+/* Sections */
+.ts-section {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 72px 32px;
+}
+
+.ts-section-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ts-forest);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.ts-section-title {
+  font-size: 38px;
+  color: var(--ts-forest);
+  margin-bottom: 12px;
+}
+
+.ts-section-subhead {
+  font-size: 16px;
+  color: var(--ts-text-secondary);
+  max-width: 620px;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+/* 3-Step Cards */
+.ts-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.ts-step-card {
+  background: var(--ts-surface);
+  border: 1px solid var(--ts-border);
+  border-radius: var(--ts-radius-lg);
+  padding: 28px;
+  box-shadow: var(--ts-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-step-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 20px 42px -8px rgba(16, 59, 50, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.ts-step-card svg {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-step-card:hover svg {
+  transform: scale(1.15) rotate(-3deg);
+  color: var(--ts-emerald) !important;
+}
+
+.ts-step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.ts-step-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ts-forest);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ts-step-card h3 {
+  font-size: 20px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--ts-forest);
+  margin-bottom: 10px;
+}
+
+.ts-step-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ts-text-secondary);
+}
+
+.ts-step-footer {
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ts-border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ts-forest);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Capabilities 2x2 Grid */
+.ts-capabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.ts-capability-card {
+  background: var(--ts-surface);
+  border: 1px solid var(--ts-border);
+  border-radius: var(--ts-radius-lg);
+  padding: 28px;
+  box-shadow: var(--ts-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-capability-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 20px 42px -8px rgba(16, 59, 50, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.ts-capability-card svg {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-capability-card:hover svg {
+  transform: scale(1.15) rotate(-3deg);
+}
+
+.ts-capability-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.ts-capability-chips {
+  display: flex;
+  gap: 6px;
+}
+
+.ts-chip-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: var(--ts-bg-subtle);
+  color: var(--ts-forest);
+}
+
+.ts-capability-card h3 {
+  font-size: 20px;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--ts-forest);
+  margin-bottom: 10px;
+}
+
+.ts-capability-card p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ts-text-secondary);
+}
+
+.ts-capability-footer {
+  margin-top: 20px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ts-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Dark Green Call To Action Banner */
+.ts-cta-banner {
+  background-color: var(--ts-forest);
+  color: #FFFFFF;
+  border-radius: 24px;
+  padding: 64px 48px;
+  text-align: center;
+  margin: 40px auto 72px auto;
+  max-width: 1216px;
+  box-shadow: 0 20px 50px -10px rgba(16, 59, 50, 0.35);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-cta-banner:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 60px -10px rgba(16, 59, 50, 0.45);
+}
+
+.ts-cta-banner h2 {
+  font-size: 44px;
+  color: #FFFFFF;
+  margin-bottom: 14px;
+}
+
+.ts-cta-banner p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 580px;
+  margin: 0 auto 32px auto;
+  line-height: 1.6;
+}
+
+.ts-btn-white {
+  background-color: #FFFFFF;
+  color: var(--ts-forest);
+  padding: 13px 30px;
+  border-radius: var(--ts-radius-full);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-white::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -70%;
+  width: 45%;
+  height: 220%;
+  background: linear-gradient(to right, transparent, rgba(16, 59, 50, 0.12), transparent);
+  transform: rotate(25deg);
+  transition: left 0.75s ease;
+  pointer-events: none;
+}
+
+.ts-btn-white:hover::after {
+  left: 140%;
+}
+
+.ts-btn-white:hover {
+  background-color: #FFFFFF;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+}
+
+.ts-btn-white svg {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-white:hover svg {
+  transform: translateX(4px);
+}
+
+.ts-btn-white:active {
+  transform: scale(0.97);
+}
+
+.ts-cta-submeta {
+  margin-top: 20px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* Footer */
+.ts-landing-footer {
+  border-top: 1px solid var(--ts-border);
+  padding: 36px 32px;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  color: var(--ts-text-muted);
+}
+
+.ts-footer-brand {
+  font-weight: 700;
+  color: var(--ts-forest);
+}
+
+.ts-footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.ts-footer-links a {
+  color: var(--ts-text-muted);
+  text-decoration: none;
+}
+
+.ts-footer-links a:hover {
+  color: var(--ts-forest);
+}
+
+
+/* =====================================================================
+   STUDIO WORKBENCH / MAP NAVIGATING PAGE (Image 2)
+   ===================================================================== */
+.ts-workbench-root {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--ts-bg);
+}
+
+/* Left Sidebar */
+.ts-sidebar {
+  width: 220px;
+  background-color: var(--ts-surface);
+  border-right: 1px solid var(--ts-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 14px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.ts-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px 20px 6px;
+  border-bottom: 1px solid var(--ts-border);
+  text-decoration: none;
+  color: inherit;
+}
+
+.ts-sidebar-logo-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ts-forest);
+}
+
+.ts-sidebar-logo-sub {
+  font-size: 11px;
+  color: var(--ts-text-muted);
+}
+
+.ts-sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 16px;
+  flex: 1;
+}
+
+.ts-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--ts-radius-md);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ts-text-secondary);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.ts-sidebar-item:hover {
+  background-color: var(--ts-bg-subtle);
+  color: var(--ts-forest);
+}
+
+.ts-sidebar-item.active {
+  background-color: var(--ts-mint);
+  color: var(--ts-forest);
+  font-weight: 700;
+}
+
+.ts-sidebar-footer {
+  border-top: 1px solid var(--ts-border);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ts-status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--ts-bg-subtle);
+  padding: 6px 10px;
+  border-radius: var(--ts-radius-full);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ts-forest);
+}
+
+.ts-exit-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ts-text-muted);
+  text-decoration: none;
+  padding: 4px 6px;
+  transition: color 0.15s ease;
+}
+
+.ts-exit-link:hover {
+  color: var(--ts-forest);
+}
+
+/* Main Area (Top Bar + Map Viewport + Right Inspector) */
+.ts-main-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Top Bar */
+.ts-topbar {
+  height: 52px;
+  background-color: var(--ts-surface);
+  border-bottom: 1px solid var(--ts-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 10;
+}
+
+.ts-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ts-topbar-chip {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ts-forest);
+  background-color: var(--ts-bg-subtle);
+  padding: 4px 10px;
+  border-radius: var(--ts-radius-full);
+  border: 1px solid var(--ts-border);
+}
+
+.ts-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Content Area: Map + Inspector */
+.ts-content-split {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Map Viewport Area */
+.ts-map-container {
+  flex: 1;
+  position: relative;
+  background-color: #E2E8E5;
+}
+
+/* Map Floating Top Toolbar */
+.ts-map-toolbar {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 6px 10px;
+  border-radius: var(--ts-radius-full);
+  box-shadow: var(--ts-shadow-md);
+  border: 1px solid var(--ts-border);
+}
+
+.ts-tool-btn {
+  background-color: transparent;
+  border: none;
+  padding: 6px 12px;
+  border-radius: var(--ts-radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ts-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.ts-tool-btn:hover {
+  background-color: var(--ts-bg-subtle);
+  color: var(--ts-forest);
+}
+
+.ts-tool-btn.active {
+  background-color: var(--ts-forest);
+  color: #FFFFFF;
+}
+
+.ts-tool-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 8px;
+  border-left: 1px solid var(--ts-border-strong);
+}
+
+.ts-tool-input {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--ts-text-main);
+  outline: none;
+  width: 140px;
+}
+
+/* Map Floating Right Controls */
+.ts-map-controls-right {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ts-control-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ts-radius-sm);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--ts-border);
+  box-shadow: var(--ts-shadow-sm);
+  color: var(--ts-forest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ts-control-icon-btn:hover {
+  background: #FFFFFF;
+  box-shadow: var(--ts-shadow-md);
+}
+
+/* Map Floating Bottom Left Legend */
+.ts-map-legend {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--ts-border);
+  border-radius: var(--ts-radius-md);
+  padding: 10px 14px;
+  box-shadow: var(--ts-shadow-md);
+  min-width: 180px;
+}
+
+.ts-map-legend-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ts-forest);
+  margin-bottom: 6px;
+}
+
+.ts-map-legend-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ts-text-muted);
+}
+
+.ts-map-legend-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #D8B48D, #93C5FD, #0284C7, #0369A1);
+  margin-bottom: 4px;
+}
+
+.ts-map-legend-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--ts-text-muted);
+}
+
+/* Map Floating Bottom Right Scale Badge */
+.ts-map-scale-badge {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--ts-border);
+  border-radius: var(--ts-radius-sm);
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ts-forest);
+  box-shadow: var(--ts-shadow-sm);
+}
+
+/* Right Inspector Panel */
+.ts-inspector {
+  width: 420px;
+  background-color: var(--ts-surface);
+  border-left: 1px solid var(--ts-border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex-shrink: 0;
+  z-index: 20;
+  position: relative;
+}
+
+/* Stepper Tabs */
+.ts-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ts-step-tab {
+  padding: 4px 10px;
+  border-radius: var(--ts-radius-full);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  background-color: var(--ts-bg-subtle);
+  color: var(--ts-forest);
+}
+
+.ts-step-tab.active {
+  background-color: var(--ts-forest);
+  color: #FFFFFF;
+}
+
+.ts-inspector-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ts-text-muted);
+  margin-bottom: 6px;
+}
+
+.ts-inspector-title {
+  font-size: 21px;
+  color: var(--ts-forest);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.ts-inspector-subtitle {
+  font-size: 12.5px;
+  color: var(--ts-text-secondary);
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+
+/* 6 Option Cards (2 Columns) */
+.ts-layers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.ts-layer-card {
+  background: var(--ts-surface);
+  border: 1px solid var(--ts-border);
+  border-radius: var(--ts-radius-md);
+  padding: 9px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.ts-layer-card:hover {
+  border-color: rgba(16, 59, 50, 0.35);
+  background-color: var(--ts-surface-hover);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(16, 59, 50, 0.08);
+}
+
+.ts-layer-card:active {
+  transform: scale(0.98);
+}
+
+.ts-layer-card.active {
+  border: 2px solid var(--ts-forest);
+  background-color: #F0FDF4;
+  box-shadow: 0 4px 14px rgba(16, 59, 50, 0.08);
+}
+
+.ts-layer-card-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ts-forest);
+  margin-bottom: 2px;
+}
+
+.ts-layer-card-code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ts-text-muted);
+}
+
+@keyframes tsPulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.ts-layer-active-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--ts-forest);
+  animation: tsPulseRing 2s infinite;
+}
+
+/* Analytical Result Box */
+.ts-result-box {
+  background-color: #EBF7F2;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--ts-radius-md);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.ts-result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ts-result-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background-color: #FFFFFF;
+  color: var(--ts-forest);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(16, 59, 50, 0.1);
+}
+
+.ts-result-confidence {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ts-text-secondary);
+}
+
+.ts-result-headline {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ts-forest);
+  margin-bottom: 6px;
+}
+
+.ts-result-body {
+  font-size: 12.5px;
+  color: var(--ts-text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.ts-result-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(16, 59, 50, 0.08);
+  color: var(--ts-text-secondary);
+}
+
+.ts-result-stat-val {
+  font-weight: 700;
+  color: var(--ts-forest);
+}
+
+/* Opacity Slider */
+.ts-slider-wrap {
+  margin-bottom: 24px;
+}
+
+.ts-slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ts-forest);
+  margin-bottom: 8px;
+}
+
+.ts-range-slider {
+  width: 100%;
+  accent-color: var(--ts-forest);
+  cursor: pointer;
+}
+
+/* Bottom Action Buttons */
+.ts-inspector-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--ts-surface);
+  display: flex;
+  gap: 10px;
+  padding: 12px 0 2px 0;
+  margin-top: auto;
+  border-top: 1px solid var(--ts-border);
+  z-index: 30;
+  box-shadow: 0 -8px 16px -4px rgba(0, 0, 0, 0.04);
+}
+
+.ts-btn-action-primary {
+  flex: 1.2;
+  background-color: var(--ts-forest);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--ts-radius-md);
+  padding: 12px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(16, 59, 50, 0.15);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-action-primary:hover {
+  background-color: var(--ts-forest-dark);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 18px rgba(16, 59, 50, 0.25);
+}
+
+.ts-btn-action-primary svg {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-action-primary:hover svg {
+  transform: scale(1.1);
+}
+
+.ts-btn-action-primary:active {
+  transform: scale(0.97);
+}
+
+.ts-btn-action-secondary {
+  flex: 1;
+  background-color: var(--ts-surface);
+  color: var(--ts-forest);
+  border: 1px solid var(--ts-border-strong);
+  border-radius: var(--ts-radius-md);
+  padding: 12px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-action-secondary:hover {
+  background-color: var(--ts-bg-subtle);
+  border-color: var(--ts-forest);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 4px 14px rgba(16, 59, 50, 0.08);
+}
+
+.ts-btn-action-secondary svg {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-action-secondary:hover svg {
+  transform: scale(1.1);
+}
+
+.ts-btn-action-secondary:active {
+  transform: scale(0.97);
+}
+
+
+/* =====================================================================
+   MISSION CONTROL RETROFIT (ADAPTING EXISTING SUBPAGES TO TERRASCOPE)
+   ===================================================================== */
+.mc-root {
+  background-color: var(--ts-bg) !important;
+  color: var(--ts-text-main) !important;
+}
+
+.mc-header {
+  background: var(--ts-surface) !important;
+  border-bottom: 1px solid var(--ts-border) !important;
+  color: var(--ts-forest) !important;
+}
+
+.mc-nav-tab {
+  color: var(--ts-text-secondary) !important;
+}
+
+.mc-nav-tab:hover {
+  color: var(--ts-forest) !important;
+  background: var(--ts-bg-subtle) !important;
+}
+
+.mc-nav-tab.active {
+  color: var(--ts-forest) !important;
+  background: var(--ts-mint) !important;
+}
+
+.mc-card, .mc-page-container {
+  color: var(--ts-text-main) !important;
+}
+
+.mc-btn-primary-gradient {
+  background: var(--ts-forest) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--ts-shadow-sm) !important;
+}
+
+.mc-btn-primary-gradient:hover {
+  background: var(--ts-forest-dark) !important;
+}
+
+.mc-chip-btn {
+  background: var(--ts-surface) !important;
+  border-color: var(--ts-border-strong) !important;
+  color: var(--ts-forest) !important;
+}
+
+.mc-chip-btn:hover {
+  background: var(--ts-bg-subtle) !important;
+}
+
+/* Glass Card & Panes in Terrascope Light Theme */
+.mc-glass-card, .mc-hud-card {
+  background: var(--ts-surface) !important;
+  border: 1px solid var(--ts-border) !important;
+  box-shadow: var(--ts-shadow-sm) !important;
+  color: var(--ts-text-main) !important;
+}
+
+.mc-pane-title-group h2, .mc-page-header h1 {
+  color: var(--ts-forest) !important;
+  font-family: var(--font-serif) !important;
+}
+
+.mc-step-badge {
+  color: var(--ts-forest) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.mc-coords-grid, .mc-stat-box, .mc-metric-card {
+  background: var(--ts-bg-subtle) !important;
+  border: 1px solid var(--ts-border) !important;
+  color: var(--ts-text-main) !important;
+}
+
+.mc-coord-label, .mc-metric-label {
+  color: var(--ts-text-muted) !important;
+}
+
+.mc-coord-val, .mc-metric-val {
+  color: var(--ts-forest) !important;
+}
+
+input, select, textarea {
+  color: var(--ts-text-main) !important;
+}
+
+/* =====================================================================
+   AOI FLOATING SEARCH BANNER & SCENE SELECTOR MODAL
+   ===================================================================== */
+.ts-aoi-search-banner {
+  position: absolute;
+  top: 68px;
+  left: 16px;
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--ts-border);
+  border-radius: var(--ts-radius-full);
+  padding: 6px 8px 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 8px 24px rgba(16, 59, 50, 0.12);
+  animation: tsSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tsSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scene Selector Modal Backdrop & Dialog */
+.ts-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 41, 34, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: tsFadeIn 0.2s ease;
+}
+
+@keyframes tsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ts-scene-modal {
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(10, 41, 34, 0.25);
+  border: 1px solid var(--ts-border);
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: tsScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tsScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.ts-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--ts-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ts-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ts-forest);
+  margin: 0;
+}
+
+.ts-modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--ts-text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ts-modal-close-btn:hover {
+  background: var(--ts-bg-subtle);
+  color: var(--ts-forest);
+}
+
+.ts-modal-filters {
+  padding: 14px 24px;
+  background: var(--ts-bg-subtle);
+  border-bottom: 1px solid var(--ts-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ts-date-preset-chip {
+  padding: 4px 10px;
+  border-radius: var(--ts-radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--ts-border-strong);
+  background: #FFFFFF;
+  color: var(--ts-forest);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ts-date-preset-chip.active {
+  background: var(--ts-forest);
+  color: #FFFFFF;
+  border-color: var(--ts-forest);
+}
+
+.ts-scene-list {
+  padding: 16px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.ts-scene-card-item {
+  background: #FFFFFF;
+  border: 1px solid var(--ts-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-scene-card-item:hover {
+  border-color: var(--ts-forest);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(16, 59, 50, 0.08);
+}
+
+.ts-scene-card-item.selected {
+  border: 2px solid var(--ts-forest);
+  background: #F0FDF4;
+}
+
+/* =====================================================================
+   COMPREHENSIVE SMOOTH SCROLLING, HOVER & MICRO-INTERACTION ANIMATIONS
+   ===================================================================== */
+
+/* 1. Custom Smooth Editorial Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EFF3EE;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD6CE;
+  border-radius: var(--ts-radius-full);
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ts-forest);
+}
+
+/* 2. Light Leaflet Map Canvas Override */
+.leaflet-container {
+  background-color: #E2E8E5 !important;
+  font-family: var(--font-sans) !important;
+}
+
+/* 3. Interactive Card Hover Effects */
+.ts-card-interactive {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow;
+}
+
+.ts-card-interactive:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px -4px rgba(16, 59, 50, 0.12), 0 3px 10px rgba(16, 59, 50, 0.05);
+  border-color: rgba(16, 59, 50, 0.28);
+}
+
+/* 4. Action Button Shimmer Wave & Active Press */
+.ts-btn-action-primary,
+.ts-btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-btn-action-primary::after,
+.ts-btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  transform: rotate(25deg);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.ts-btn-action-primary:hover::after,
+.ts-btn-primary:hover::after {
+  opacity: 1;
+  animation: tsShimmerWave 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tsShimmerWave {
+  0% { left: -60%; }
+  100% { left: 140%; }
+}
+
+.ts-btn-action-primary:hover,
+.ts-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 59, 50, 0.25);
+}
+
+.ts-btn-action-primary:active,
+.ts-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.ts-btn-action-secondary:hover {
+  transform: translateY(-2px);
+  background-color: var(--ts-bg-subtle);
+  border-color: var(--ts-forest);
+  box-shadow: 0 4px 14px rgba(16, 59, 50, 0.08);
+}
+
+.ts-btn-action-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* 5. User Avatar Hover */
+.ts-avatar-hover:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(16, 59, 50, 0.2);
+}
+
+/* 6. Step Card & Capability Card Hover Enhancements */
+.ts-step-card,
+.ts-capability-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow;
+}
+
+.ts-step-card:hover,
+.ts-capability-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px -4px rgba(16, 59, 50, 0.12), 0 4px 12px rgba(16, 59, 50, 0.04);
+  border-color: rgba(16, 59, 50, 0.24);
+}
+
+/* 7. Layer Card Hover (Image 5) */
+.ts-layer-card {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-layer-card:hover:not(.active) {
+  transform: translateY(-2px);
+  border-color: rgba(16, 59, 50, 0.28);
+  background-color: var(--ts-surface-hover);
+  box-shadow: 0 4px 14px rgba(16, 59, 50, 0.06);
+}
+
+.ts-layer-card.active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(16, 59, 50, 0.1);
+}
+
+/* 8. KPI Metric Cards Hover (Image 1) */
+.ts-kpi-card {
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -2px rgba(16, 59, 50, 0.1);
+  border-color: rgba(16, 59, 50, 0.24);
+}
+
+/* 9. Phenology Insight Cards Hover (Image 1) */
+.ts-insight-card {
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ts-insight-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -2px rgba(16, 59, 50, 0.09);
+  border-color: rgba(16, 59, 50, 0.22);
+}
+
+/* 10. Dossier Sheet Hover Glow (Image 3) */
+.ts-dossier-sheet {
+  transition: box-shadow 0.35s ease;
+}
+
+.ts-dossier-sheet:hover {
+  box-shadow: 0 18px 50px -8px rgba(16, 59, 50, 0.15), 0 6px 18px rgba(16, 59, 50, 0.06);
+}
+
+/* 11. Stagger Delay Classes */
+.ts-stagger-1 { transition-delay: 0.06s; }
+.ts-stagger-2 { transition-delay: 0.12s; }
+.ts-stagger-3 { transition-delay: 0.18s; }
+.ts-stagger-4 { transition-delay: 0.24s; }
+.ts-stagger-5 { transition-delay: 0.30s; }
+.ts-stagger-6 { transition-delay: 0.36s; }
+
+/* 12. Clean Print / Save As PDF Styles */
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #11231F !important;
+  }
+  .ts-sidebar,
+  .ts-topbar,
+  .ts-landing-header-wrap,
+  .ts-inspector-actions,
+  .ts-btn-secondary,
+  .ts-btn-primary,
+  .ts-map-toolbar,
+  .ts-map-controls-right,
+  .ts-aoi-search-banner,
+  .ts-modal-backdrop,
+  button {
+    display: none !important;
+  }
+  .ts-main-stage,
+  .ts-workbench-root,
+  .ts-dossier-sheet {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .ts-page-wrapper {
+    padding: 0 !important;
+  }
+}
+
+
